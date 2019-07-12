@@ -33,7 +33,6 @@ B_pair1 = np.arange(B_start, B_end, B_step)
 B_pair2 = np.arange(B_start, B_end, B_step) + end_to_end_range
 B_range_list = [[a,b] for a,b in zip(B_pair1, B_pair2)]
 
-
 def do_train(A_idx, B_idx, loss_threshold = 0.15, GPU_index = '1', Preprocess = False):
     '''
     function do trains! 
@@ -94,7 +93,6 @@ def do_train(A_idx, B_idx, loss_threshold = 0.15, GPU_index = '1', Preprocess = 
         Y_train[: len(Y_train)//2 * 1] = np.ones((len(Y_train)//2, 1))
         indices = np.arange(0, len(X_train) - batch_size)
         
-        
         while 1:
             start_idx = np.random.choice(indices)
             x_train = X_train[start_idx:start_idx + batch_size]
@@ -128,16 +126,15 @@ def do_train(A_idx, B_idx, loss_threshold = 0.15, GPU_index = '1', Preprocess = 
         
         return model
         
-        
     input_shape = (12000,)
     model = model_gen(input_shape)
     # print(model.summary())
     model.compile(optimizer=Adam(lr=0.8 * 1e-5), loss = 'binary_crossentropy', metrics=['accuracy'])
     DATE = str(time.localtime().tm_year) + '_' + str(time.localtime().tm_mon) + '_' + str(time.localtime().tm_mday)
     if Preprocess:
-        save_directory = '/home/sonic/Coding/Decomposition/Simul_Data/keras_save_model/{}_Dense_Taminiau_2spin_classification_32_12000_points_ghkim_'.format(DATE)+AB_range_index+'_'+AB_range+Preprocess+'/'
+        save_directory = '/home/sonic/Coding/Decomposition/Simul_Data/keras_save_model/{}_Dense_Tim_classify_N32_12000_'.format(DATE)+AB_range_index+'_'+AB_range+Preprocess+'/'    
     else:
-        save_directory = '/home/sonic/Coding/Decomposition/Simul_Data/keras_save_model/{}_Dense_Taminiau_2spin_classification_32_12000_points_ghkim_'.format(DATE)+AB_range_index+'_'+AB_range+'/'
+        save_directory = '/home/sonic/Coding/Decomposition/Simul_Data/keras_save_model/{}_Dense_Tim_classify_N32_12000_'.format(DATE)+AB_range_index+'_'+AB_range+'/'
 
     if not(os.path.isdir(save_directory)):
         os.mkdir(save_directory)
@@ -176,7 +173,6 @@ def do_train(A_idx, B_idx, loss_threshold = 0.15, GPU_index = '1', Preprocess = 
         print("{} Iteration Completed.".format(i+1))
 
         list_of_save_files = glob.glob(save_directory+'*.h5')
-        print(list_of_save_files)
         latest_file = max(list_of_save_files, key=os.path.getctime)
         list_of_save_files.remove(latest_file)
         for file in list_of_save_files: os.remove(file)

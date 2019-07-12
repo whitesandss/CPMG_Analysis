@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import multiprocessing as mp
-from decom_utils.py import *
+import sys
+sys.path.insert(0, '/home/sonic/Coding/Git/CPMG_Analysis/')
+from decom_utils import *
 import numpy as np
 import time
 import os
@@ -55,8 +57,6 @@ A_range_list = [[a,b] for a,b in zip(A_pair1, A_pair2)]
 B_pair1 = np.arange(B_start, B_end, B_step)
 B_pair2 = np.arange(B_start, B_end, B_step) + end_to_end_range
 B_range_list = [[a,b] for a,b in zip(B_pair1, B_pair2)]
-
-
 
 def gen_AB_lists_to_px_lists(start_idx, target_AB_included, none_target_AB, count):
     n_samples = 1400

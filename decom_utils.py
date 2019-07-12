@@ -1,11 +1,9 @@
 import matplotlib.pyplot as plt
-from random import randint, uniform
 from copy import deepcopy
 from scipy import stats
 import pandas as pd
 import numpy as np
 import matplotlib
-import sklearn
 import pickle
 import random
 import os, sys
@@ -126,7 +124,7 @@ def gaussian_slope(M_list, time_table, time_index, px_mean_value_at_time):
 #         M_list_temp = M_list_temp.reshape(n_samples, n_spins, n_time_values)
 #         M_list[:, idx, :] = np.prod(M_list_temp, axis=1)    #  c, b         c = n_samples
 
-#     return M_list
+#     return M_list\\\\\\\\\\\\\
 
 def M_list_return(time_table, wL_value, AB_list, n_pulse):  # AB_list must be an array, not list
 
@@ -560,3 +558,45 @@ def get_error(px_list, exp_data, threshold=0.06):
     return error
     # model에서 prediction한 후, px_list(CPMG simulation graph) 와 실험치의 RMS를 return
     # 나중에는 이 값을 다 취합하여 최소 RMS를 구한다.
+
+def delete_same_value_with_avg(list_A, list_B): 
+    temp_A = list_A.reshape(-1, 1)
+    temp_B = list_B.reshape(-1, 1)
+    total_temp = np.concatenate((temp_A, temp_B), axis=1)
+
+    df = pd.DataFrame(total_temp)
+    df2 = df.groupby(0).mean().reset_index()
+
+    return df2
+
+def get_filtered_idx(M_value): # filter 기준 : (mean-std)가 기준
+    mean = np.mean(M_value)
+    std = np.std(M_value)
+    boolean_M = M_value < (mean-std)
+
+    count = 0
+    indices = []
+    for i, idx in enumerate(boolean_M):
+        if idx == True:
+            indices.append(i)
+
+    temp_idx = []
+    temp_idx.append(indices[0]-10)
+    for i, idx in enumerate(indices):
+        if i != (len(indices)-1):
+            temp1 = indices[i+1] - idx
+        if temp1 > 100:
+            temp_idx.append(indices[i]+10)
+            if i > (len(indices)-2):break
+            temp_idx.append(indices[i+1]-10)
+    temp_idx.append(indices[-1]+10)
+    
+    filtered_idx = []
+    for i in range(0, len(temp_idx)-1, 2):
+        if (i == 11999) or (i == 12000): break
+        filtered_idx += [i for i in range(temp_idx[i], temp_idx[i+1]+1)]
+
+    filtered_arr = np.array(filtered_idx)
+    filtered_arr = filtered_arr[(filtered_arr>-1) & (filtered_arr<12000)]
+
+    return filtered_arr
