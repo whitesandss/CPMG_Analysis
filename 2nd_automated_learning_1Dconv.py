@@ -1,4 +1,4 @@
-from keras.layers import Dense, Activation, Dropout, Input, GaussianNoise
+from keras.layers import Dense, Activation, Dropout, Input, GaussianNoise, Conv1D, MaxPooling1D, Flatten, concatenate
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras.utils import multi_gpu_model
@@ -24,21 +24,20 @@ N_PULSE_32 = 32
 
 N_FILES = 1
 POOL_PROCESS = 23
-N_SAMPLES_PER_PROCESS = 8192
-GPU_INDEX = '1'
+N_SAMPLES_PER_PROCESS = 3000
+GPU_INDEX = '0'
 BATCH_SIZE = 4096
 
 a = [0, 1, 2, 17, 18, 19, 34, 35, 36, 51, 52, 53, 68, 69, 70, 85, 86, 87, 102, 103, 104, 119, 120, 121, 136, 137, 138, 153, 154, 155, 
 170, 171, 172, 187, 188, 189, 204, 205, 206, 221, 222, 223, 238, 239, 240, 255, 256, 257, 272, 273, 274, 289, 290, 291, 306, 307, 
-308, 323, 324, 325, 340, 341, 342, 357, 358, 359, 374, 375, 376, 391, 392, 393, 408, 409, 410, 425, 426, 427, 442, 443, 444, 459,
-460, 461, 476, 477, 478, 493, 494, 495, 510, 511, 512, 527, 528, 529, 544, 545, 546, 561, 562, 563, 578, 579, 580, 595, 596, 597, 
-612, 613, 614, 629, 630, 631, 646, 647, 648, 663, 664, 665, 680, 681, 682, 697, 698, 699, 714, 715, 716, 731, 732, 733, 748, 749]
-
-# a = [750, 765, 766, 767, 782, 783, 784, 799, 800, 801, 816, 817, 818, 833, 834, 835, 850, 851, 852, 867, 868, 869, 884, 885, 886, 901,
-# 902, 903, 918, 919, 920, 935, 936, 937, 952, 953, 954, 969, 970, 971, 986, 987, 988, 1003, 1004, 1005, 1020, 1021, 1022, 1037, 
-# 1038, 1039, 1054, 1055, 1056, 1071, 1072, 1073, 1088, 1089, 1090, 1105, 1106, 1107, 1122, 1123, 1124, 1139, 1140, 1141, 1156,
-# 1157, 1158, 1173, 1174, 1175, 1190, 1191, 1192, 1207, 1208, 1209, 1224, 1225, 1226, 1241, 1242, 1243, 1258, 1259, 1260, 1275, 
-# 1276, 1277, 1292, 1293, 1294, 1309, 1310, 1311, 1326, 1327, 1328, 1343, 1344, 1345]
+308, 323, 324, 325, 340, 341, 342, 357, 358, 359, 374, 375, 376, 391, 392, 393, 408, 409, 410, 425, 426, 427, 442, 443, 444, 459] 
+# a = [460, 461, 476, 477, 478, 493, 494, 495, 510, 511, 512, 527, 528, 529, 544, 545, 546, 561, 562, 563, 578, 579, 580, 595, 596, 597, 
+# 612, 613, 614, 629, 630, 631, 646, 647, 648, 663, 664, 665, 680, 681, 682, 697, 698, 699, 714, 715, 716, 731, 732, 733, 748, 749, 
+# 750, 765, 766, 767, 782, 783, 784, 799, 800, 801, 816, 817, 818, 833, 834, 835, 850, 851, 852, 867, 868, 869, 884, 885, 886, 901]
+# a = [902, 903, 918, 919, 920, 935, 936, 937, 952, 953, 954, 969, 970, 971, 986, 987, 988, 1003, 1004, 1005, 1020, 1021, 1022, 1037, 
+# 1038, 1039, 1054, 1055, 1056, 1071, 1072, 1073, 1088, 1089, 1090, 1105, 1106, 1107, 1122, 1123, 1124, 1139, 1140, 1141, 1156]
+# a = [1157, 1158, 1173, 1174, 1175, 1190, 1191, 1192, 1207, 1208, 1209, 1224, 1225, 1226, 1241, 1242, 1243, 1258, 1259, 1260, 1275, 
+#  1276, 1277, 1292, 1293, 1294, 1309, 1310, 1311, 1326, 1327, 1328, 1343, 1344, 1345]
 
 TIME_DATA = np.load('/home/sonic/Coding/Git/temp/20190704_no_duplicated_time.npy')*1e-6
 EXP_DATA = np.load('/home/sonic/Coding/Git/temp/20190704_no_duplicated_expdata.npy')
@@ -51,7 +50,8 @@ px_paper, slope = gaussian_slope(exp_data, time_data, SLOPE_INDEX, MEAN_PX_VALUE
 START_IDX = int(input("Enter the start index : "))
 END_IDX = int(input("Enter the end index : ")) 
 file_idx_dic = {}
-for file_idx in a:
+
+for file_idx in [0, 17]:
     print("file_idx", file_idx)
     history = []
     total_time = []
@@ -130,7 +130,7 @@ for file_idx in a:
 
     X_train = np.zeros(((init_n_samples*46, len(filtered_time_data))))
     X_valid_32 = np.zeros(((init_n_samples*2, len(filtered_time_data))))
-    X_eval_32 = np.zeros(((init_n_samples*2, len(filtered_time_data))))
+    # X_eval_32 = np.zeros(((init_n_samples*2, len(filtered_time_data))))
 
     X_train[init_n_samples*0:init_n_samples*1],   X_train[init_n_samples*23:init_n_samples*24] = result1.get(timeout=None)
     X_train[init_n_samples*1:init_n_samples*2],   X_train[init_n_samples*24:init_n_samples*25] = result2.get(timeout=None)
@@ -163,6 +163,7 @@ for file_idx in a:
     pool.close()
     pool.join()
     toc = time.time()
+    total_time.append(toc-tic)
     print("Calculated Time : {} s".format(toc-tic))
     
     Y_train = np.zeros((len(X_train), 1))
@@ -172,35 +173,56 @@ for file_idx in a:
     Y_valid[:int(len(X_valid_32) / 2)] = np.ones((int(len(X_valid_32)/2), 1))
     # Y_eval[:int(len(X_eval_32) / 2)] = np.ones((int(len(X_eval_32)/2), 1))
     
-    np.save('/data1/keras_model/{}/{}_X_train.npy'.format(file_idx,file_idx),X_train)
-    np.save('/data1/keras_model/{}/{}_X_valid.npy'.format(file_idx,file_idx),X_valid_32)
-'''
     X_train = (X_train + 1) / 2
     X_train = X_train * (1-X_train)
     X_train = 2*X_train-0.25
+    for i in range(8, len(X_train)//2):
+        temp = len(X_train.flatten()) // len(X_train)
+        if temp % i == 0:
+            X_train = X_train.reshape(len(X_train), i, -1)
+            print("X_train_shape", X_train.shape)
+            break
+
     X_valid_32 = (X_valid_32 + 1) / 2
     X_valid_32 = X_valid_32 * (1-X_valid_32)
     X_valid_32 = 2*X_valid_32-0.25
-    
+    X_valid_32 = X_valid_32.reshape(len(X_valid_32), X_train.shape[1], -1)
+
     os.environ["CUDA_VISIBLE_DEVICES"] = GPU_INDEX
     config = tf.ConfigProto(device_count = {'XLA_GPU' : 0})
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
     keras.backend.set_session(sess)
     
-    input_shape = (len(filtered_time_data),)
-
+    input_shape = (X_train.shape[1], X_train.shape[2])
+    
     def gen_model(input_shape):
         X_train = Input(input_shape, dtype='float32')
-        X = Dense(4096, activation='relu')(X_train)
-        X = Dropout(0.4)(X)
-        X = Dense(2048, activation='relu')(X)
-        X = Dropout(0.2)(X)
-        X = Dense(1024, activation='relu')(X)
-        X = Dropout(0.2)(X)
-        X = Dense(512, activation='relu')(X)
-        X = Dropout(0.2)(X)
-        X = Dense(1, activation='sigmoid')(X)
+
+        X = Conv1D(32, kernel_size = 16, activation='relu')(X_train)
+        X = Conv1D(32, kernel_size = 16, activation='relu')(X)
+        X = MaxPooling1D()(X)
+        X = Flatten()(X)
+
+        T = Conv1D(16, kernel_size = 16, activation='relu')(X_train)
+        T = Conv1D(16, kernel_size = 16, activation='relu')(T)
+        T = MaxPooling1D()(T)
+        T = Flatten()(T)
+        
+        M = concatenate([X,T])
+        M = Dense(4096, activation='relu')(M)
+        M = GaussianNoise(0.01)(M)
+        M = Dropout(0.4)(M)
+        M = Dense(2048, activation='relu')(M)
+        M = GaussianNoise(0.01)(M)
+        M = Dropout(0.4)(M)
+        M = Dense(1024, activation='relu')(M)
+        M = GaussianNoise(0.01)(M)
+        M = Dropout(0.4)(M)
+        M = Dense(512, activation='relu')(M)
+        M = Dropout(0.4)(M)
+
+        X = Dense(1, activation='sigmoid')(M)
 
         model = Model(inputs=X_train, outputs=X)
         return model
@@ -212,6 +234,7 @@ for file_idx in a:
     if not(os.path.isdir(save_directory)):
         os.mkdir(save_directory)
 
+    print(model.summary())
     current_time = time.localtime()[:]
     model_savename = str(current_time[0])+'_'+str(current_time[1])+'_'+str(current_time[2])+'_'+str(current_time[3])+'_'+str(current_time[4])+'_'
     checkpointer = ModelCheckpoint(save_directory + model_savename + 'model_{}_{}_{}.h5'.format(file_idx, A_temp, B_temp),
@@ -274,12 +297,6 @@ for file_idx in a:
 
     del X_train, X_valid_32
     
-    # keras.backend.clear_session()
     sess.close()
-    gc.collect() 
-    # os.environ["CUDA_VISIBLE_DEVICES"] = GPU_INDEX
-    # config = tf.ConfigProto(device_count = {'XLA_GPU' : 0})
-    # config.gpu_options.allow_growth = True
-    # sess = tf.Session(config=config)
-    # keras.backend.set_session(sess)
-'''
+    gc.collect()
+
