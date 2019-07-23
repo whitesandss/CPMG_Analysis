@@ -24,7 +24,7 @@ N_PULSE_32 = 32
 
 N_FILES = 1
 POOL_PROCESS = 23
-N_SAMPLES_PER_PROCESS = 12288
+N_SAMPLES_PER_PROCESS = 4096
 GPU_INDEX = '1'
 BATCH_SIZE = 4096
 
@@ -65,7 +65,7 @@ px_paper, slope = gaussian_slope(exp_data, time_data, SLOPE_INDEX, MEAN_PX_VALUE
 # END_IDX = int(input("Enter the end index : ")) 
 
 for file_idx in FILE_INDICES:
-    SAVE_DATA_DIR = '/data1/keras_model/{}/'.format(file_idx)
+    SAVE_DATA_DIR = '/data2/'
     print("file_idx", file_idx)
     history = []
     total_time = []
@@ -178,8 +178,11 @@ for file_idx in FILE_INDICES:
     toc = time.time()
     print("Calculated Time : {} s".format(toc-tic))
     
-    np.save(SAVE_DATA_DIR + '{}_X_train_2.npy'.format(file_idx),X_train)
-    np.save(SAVE_DATA_DIR + '{}_X_valid_2.npy'.format(file_idx),X_valid_32)
+    np.save(SAVE_DATA_DIR + '{}_X_train_2_222.npy'.format(file_idx),X_train)
+    np.save(SAVE_DATA_DIR + '{}_X_valid_2_222.npy'.format(file_idx),X_valid_32)
+
+    toc2 = time.time()
+    print("Calculated Time : {} s".format(toc2-toc))
 
     del X_train, X_valid_32
     gc.collect() 
