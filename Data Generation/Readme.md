@@ -1,2 +1,2 @@
 
-#### This shows what had been done for the exp_data pre-processing and traning data generation.
+#### This shows what had been done for exp_data pre-processing and traning data generation.
