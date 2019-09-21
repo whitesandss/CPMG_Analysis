@@ -16,6 +16,10 @@ import tensorflow as tf
 import keras
 import time
 import gc
+import plotly
+from plotly import __version__
+print(__version__)
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 
 MAGNETIC_FIELD = 403.7139663551402            # Unit: Gauss
 GYRO_MAGNETIC_RATIO = 1.07*1000               # Unit: Herts
@@ -178,11 +182,11 @@ for file_idx in FILE_INDICES:
     toc = time.time()
     print("Calculated Time : {} s".format(toc-tic))
     
-    np.save(SAVE_DATA_DIR + '{}_X_train_2_222.npy'.format(file_idx),X_train)
-    np.save(SAVE_DATA_DIR + '{}_X_valid_2_222.npy'.format(file_idx),X_valid_32)
+    np.save(SAVE_DATA_DIR + '{}_X_train_2.npy'.format(file_idx),X_train)
+    np.save(SAVE_DATA_DIR + '{}_X_valid_2.npy'.format(file_idx),X_valid_32)
 
     toc2 = time.time()
     print("Calculated Time : {} s".format(toc2-toc))
 
     del X_train, X_valid_32
-    gc.collect() 
+    gc.collect()

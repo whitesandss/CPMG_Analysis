@@ -1,9 +1,8 @@
-import sys
-sys.path.insert(0, '/home/sonic/Coding/Git/CPMG_Analysis/')
-from decom_utils import *
 import numpy as np
 import time
-import os
+import matplotlib.pyplot as plt
+import os, glob
+import gc
 
 time_table = np.load('/home/sonic/Coding/Git/temp/20190704_no_duplicated_time.npy')[:12000]*1e-6
 
@@ -11,13 +10,13 @@ MAGNETIC_FIELD = 403.7139663551402    # Unit: Gauss
 GYRO_MAGNETIC_RATIO = 1.07*1000       # Unit: Herts
 WL_VALUE = MAGNETIC_FIELD*GYRO_MAGNETIC_RATIO*2*np.pi
 N_PULSE_32 = 32
-SAVE_AB_LISTS_DIR = '/home/sonic/Coding/Decomposition/Simul_Data/AB_lists/'
+SAVE_AB_LISTS_DIR = '/data/AB_list_3rd/'
 
 # AB의 전체 후보군 리스트
-A_search_min = -100000
-A_search_max = 100000          # Set the boundary between -100000 ~ 100000 (Hz) for A
-B_search_min = 0
-B_search_max = 80000           # Set the boundary between 0 ~ 200000 (Hz) for B
+A_search_min = -100250
+A_search_max = 100250          # Set the boundary between -100000 ~ 100000 (Hz) for A
+B_search_min = 500
+B_search_max = 80500           # Set the boundary between 0 ~ 200000 (Hz) for B
 A_steps = 500                  # interval between A points
 B_steps = 1000                 # interval between B points
 
@@ -38,10 +37,10 @@ TOTAL_TEST_ARRAY.shape
 # 모델을 만들 AB 범위
 A_start = -60000
 A_end = 60000
-A_step = 1000
+A_step = 500
 B_start = 2000
 B_end = 70000
-B_step = 2000
+B_step = 1000
 
 end_to_end_A_range = 1000
 end_to_end_B_range = 2000
@@ -58,13 +57,27 @@ AB_dic = {}
 count = 0
 for idx1, A_range in enumerate(A_range_list):
     for idx2, B_range in enumerate(B_range_list):
-        AB_dic[count] = [A_range, B_range]
+        AB_dic[count] = [[idx1, idx2], [A_range, B_range]]
         count += 1
+
+# 원하는 부분만 AB_list를 만들고 싶을때
+
+heatmap_n_rows = len(B_range_list)
+target_indices = []
+A_index_min = 21  # 원하는 A영역
+A_index_max = 26  
+B_index_min = 9   # 원하는 B영역
+B_index_max = 16
+
+for i in range(len(AB_dic)):
+    if (i//heatmap_n_rows > A_index_min) & (i//heatmap_n_rows < A_index_max):
+        if (i%heatmap_n_rows > B_index_min) & (i%heatmap_n_rows < B_index_max):
+            target_indices.append(i)
 
 # 뽑을 spin 개수 및 target 스핀 한 개당 만들 data의 개수
 n_of_spins=39
 n_of_small_spins=20 
-n_of_samples_per_target=20000
+n_of_samples_per_target=60000
 
 # AB 후보 범위
 A_candidate_max = 70000
@@ -78,8 +91,11 @@ A_small_min = -25000
 B_small_max = 14000
 B_small_min = 2000
 
-for idx in range(len(AB_dic)):
-    [A_range, B_range] = AB_dic[idx]
+for idx in AB_dic.keys():
+    if len(glob.glob('/data/AB_list_3rd/{}_*.npy'.format(idx))) == 2: continue
+    print(idx)
+
+    [[idx1,idx2], [A_range, B_range]] = AB_dic[idx]
     
     A_min = A_range[0]
     A_max = A_range[1]
@@ -151,8 +167,8 @@ for idx in range(len(AB_dic)):
     np.random.shuffle(target_AB_included)
 
     plt.figure(facecolor='w', figsize=(20,10))
-    plt.plot(none_target_AB[:1000,0,0]/2/np.pi, none_target_AB[:1000,0,1]/2/np.pi, 'o')
-    plt.plot(target_AB_included[:1000,0,0]/2/np.pi, target_AB_included[:1000,0,1]/2/np.pi, 'o')
+    plt.plot(none_target_AB[:10000,0,0]/2/np.pi, none_target_AB[:10000,0,1]/2/np.pi, 'o')
+    plt.plot(target_AB_included[:10000,0,0]/2/np.pi, target_AB_included[:10000,0,1]/2/np.pi, 'o')
     plt.savefig(SAVE_AB_LISTS_DIR + "{}_AB_distributions_".format(idx) + AB_range + '_'+ str(n_of_spins) + 'spins.jpg')
 
     print("AB_range", AB_range)
@@ -167,4 +183,8 @@ for idx in range(len(AB_dic)):
     print('B_max(None): ', np.max(none_target_AB[:,0,1])/2/np.pi)
 
     np.save(SAVE_AB_LISTS_DIR + '{}_none_target_'.format(idx) + AB_range + '_'+ str(n_of_spins) + 'spin_ABlist.npy', none_target_AB)
-    np.save(SAVE_AB_LISTS_DIR + '{}_target_'.format(idx) + AB_range + '_' + str(n_of_spins) + 'spin_ABlist.npy', target_AB_included)        
+    np.save(SAVE_AB_LISTS_DIR + '{}_target_'.format(idx) + AB_range + '_' + str(n_of_spins) + 'spin_ABlist.npy', target_AB_included)
+    del target_AB_included, none_target_AB
+    if idx % 10:
+        plt.close('all')
+    gc.collect()

@@ -1,0 +1,66 @@
+Script started on Fri 09 Aug 2019 12:49:25 AM KST
+[1;47;30m[sonic@ubuntu:2nd_automation]$[m python3 5[K4th_automated_learning_2.py  M
+Using TensorFlow backend.
+Generate data from the file: 906_ABlists_184_-44000_-43000_12000_18000
+PRE_PRECESSING Changed: False --> True, power: 8
+0, 1, 2, 3, 4, 5, 6, 7, 8, 9, Time consumed: 301.2819595336914 (s)
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Linear-1              [-1, 1, 4096]       1,761,280
+              ReLU-2              [-1, 1, 4096]               0
+           Dropout-3              [-1, 1, 4096]               0
+            Linear-4              [-1, 1, 2048]       8,390,656
+              ReLU-5              [-1, 1, 2048]               0
+           Dropout-6              [-1, 1, 2048]               0
+            Linear-7              [-1, 1, 1024]       2,098,176
+              ReLU-8              [-1, 1, 1024]               0
+           Dropout-9              [-1, 1, 1024]               0
+           Linear-10               [-1, 1, 512]         524,800
+             ReLU-11               [-1, 1, 512]               0
+          Dropout-12               [-1, 1, 512]               0
+           Linear-13                [-1, 1, 10]           5,130
+          Sigmoid-14                [-1, 1, 10]               0
+================================================================
+Total params: 12,780,042
+Trainable params: 12,780,042
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.00
+Forward/backward pass size (MB): 0.18
+Params size (MB): 48.75
+Estimated Total Size (MB): 48.93
+----------------------------------------------------------------
+Training Start.. (Pre Process:True)
+Epoch:    1  | Loss = 0.29363 | Val_loss: 0.20342 | Accuracy: 46.41 %
+Epoch:    2  | Loss = 0.16797 | Val_loss: 0.14261 | Accuracy: 66.73 %
+Epoch:    3  | Loss = 0.12834 | Val_loss: 0.11757 | Accuracy: 73.08 %
+Epoch:    4  | Loss = 0.11046 | Val_loss: 0.10746 | Accuracy: 75.70 %
+Epoch:    5  | Loss = 0.10137 | Val_loss: 0.09804 | Accuracy: 77.78 %
+Epoch:    6  | Loss = 0.09235 | Val_loss: 0.10466 | Accuracy: 76.27 %
+Epoch:    7  | Loss = 0.08745 | Val_loss: 0.09293 | Accuracy: 78.81 %
+Epoch:    8  | Loss = 0.08138 | Val_loss: 0.08397 | Accuracy: 81.31 %
+Epoch:    9  | Loss = 0.07731 | Val_loss: 0.08633 | Accuracy: 80.41 %
+Epoch:   10  | Loss = 0.07330 | Val_loss: 0.08410 | Accuracy: 80.79 %
+Epoch:   11  | Loss = 0.06974 | Val_loss: 0.08172 | Accuracy: 81.86 %
+Epoch:   12  | Loss = 0.06588 | Val_loss: 0.09534 | Accuracy: 78.86 %
+Epoch:   13  | Loss = 0.06395 | Val_loss: 0.08379 | Accuracy: 81.58 %
+Epoch:   14  | Loss = 0.05914 | Val_loss: 0.07995 | Accuracy: 82.29 %
+Epoch:   15  | Loss = 0.05780 | Val_loss: 0.07940 | Accuracy: 83.14 %
+Epoch:   16  | Loss = 0.05555 | Val_loss: 0.08254 | Accuracy: 82.46 %
+Epoch:   17  | Loss = 0.05242 | Val_loss: 0.08219 | Accuracy: 82.64 %
+Epoch:   18  | Loss = 0.05089 | Val_loss: 0.08526 | Accuracy: 82.49 %
+Epoch:   19  | Loss = 0.04935 | Val_loss: 0.08366 | Accuracy: 83.05 %
+Training Done. 69.90923380851746 (s)
+Prediction..
+Model Saved.
+Training Done. File: ABlists_184_-44000_-43000_12000_18000.npy
+Generate data from the file: 907_ABlists_184_filtered_idx
+Traceback (most recent call last):
+  File "4th_automated_learning_2.py", line 53, in <module>
+    
+ValueError: invalid literal for int() with base 10: 'idx'
+[1;47;30m[sonic@ubuntu:2nd_automation]$[m exit
+exit
+
+Script done on Fri 09 Aug 2019 01:00:35 AM KST
