@@ -17,4 +17,4 @@ Automated ML model functions(Generate datas and Learning with them) are containe
 
 #### Tutorial Link
 This tutorial provides detailed procedures from data generation to training models. </br>
-URL: https://gist.github.com/ninanung/2b81a5db946c26c98c573e3662a92b62
+URL: [Tutorial Link](https://gist.github.com/ninanung/2b81a5db946c26c98c573e3662a92b62)
