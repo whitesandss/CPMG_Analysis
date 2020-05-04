@@ -13,8 +13,3 @@ Automated ML model functions(Generate datas and Learning with them) are containe
 > : Only generate data from AB_candidates file
       
 ## 3. Subtract Algorithm
-
-
-#### Tutorial Link
-This tutorial provides detailed procedures from data generation to training models. </br>
-URL: [Tutorial Link](https://gist.github.com/ninanung/2b81a5db946c26c98c573e3662a92b62)
